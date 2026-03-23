@@ -4,6 +4,7 @@ pkgs.mkShell {
     # Core tools
     git
     mask
+    nushell
     uv
   ];
 
