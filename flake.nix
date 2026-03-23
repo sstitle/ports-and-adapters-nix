@@ -5,11 +5,17 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     flake-parts.url = "github:hercules-ci/flake-parts";
     treefmt-nix.url = "github:numtide/treefmt-nix";
+    nix-unit.url = "github:nix-community/nix-unit";
+    nix-unit.inputs.nixpkgs.follows = "nixpkgs";
+    nix-unit.inputs.flake-parts.follows = "flake-parts";
   };
 
   outputs =
     inputs@{ self, flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
+      imports = [
+        inputs.nix-unit.modules.flake.default
+      ];
       systems = [
         "x86_64-linux"
         "aarch64-linux"
@@ -30,25 +36,7 @@
           treefmtEval = inputs.treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
         in
         {
-          # Development shell with nickel and mask
-          devShells.default = pkgs.mkShell {
-            buildInputs = with pkgs; [
-              # Core tools
-              git
-              mask
-              uv
-            ];
-
-            shellHook = ''
-              echo "🚀 Development environment loaded!"
-              echo "Available tools:"
-              echo "  - nickel: Configuration language"
-              echo "  - mask: Task runner"
-              echo ""
-              echo "Run 'mask --help' to see available tasks."
-              echo "Run 'nix fmt' to format all files."
-            '';
-          };
+          devShells.default = import ./shell.nix { inherit pkgs; };
 
           # for `nix fmt`
           formatter = treefmtEval.config.build.wrapper;
@@ -57,6 +45,11 @@
           checks = {
             formatting = treefmtEval.config.build.check self;
           };
+
+          nix-unit.inputs = {
+            inherit (inputs) nixpkgs flake-parts nix-unit;
+          };
+          nix-unit.tests = import ./tests { };
         };
     };
 }
