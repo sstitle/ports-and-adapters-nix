@@ -7,15 +7,15 @@ This is a [mask](https://github.com/jacobdeichert/mask) task runner file.
 > Run all nix-unit tests
 
 ```bash
-nix run github:nix-community/nix-unit -- ./tests/default.nix
+nix run github:nix-community/nix-unit -- --flake '.#tests'
 ```
 
 ## run
 
-> Display all configured users as a table
+> Display port configuration as a table
 
 ```bash
-nu scripts/show-users.nu
+nix run .#show-ports
 ```
 
 ## hello
