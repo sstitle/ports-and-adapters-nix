@@ -1,0 +1,32 @@
+"""Auto-generated gRPC servicer adapter for {{Name}}."""
+from __future__ import annotations
+
+import {{name}}_service_pb2
+import {{name}}_service_pb2_grpc
+from {{name}}_repository import {{Name}}Repository
+
+
+class {{Name}}Servicer({{name}}_service_pb2_grpc.{{Name}}ServiceServicer):
+    def __init__(self, repo: {{Name}}Repository) -> None:
+        self._repo = repo
+
+    def Get{{Name}}(self, request, context=None):
+        item = self._repo.get(request.id)
+        if item is None:
+            return {{name}}_service_pb2.Get{{Name}}Response()
+        return {{name}}_service_pb2.Get{{Name}}Response({{name}}=item)
+
+    def Create{{Name}}(self, request, context=None):
+        item = self._repo.create(request.{{name}})
+        return {{name}}_service_pb2.Create{{Name}}Response({{name}}=item)
+
+    def Update{{Name}}(self, request, context=None):
+        item = self._repo.update(request.{{name}})
+        return {{name}}_service_pb2.Update{{Name}}Response({{name}}=item)
+
+    def Delete{{Name}}(self, request, context=None):
+        success = self._repo.delete(request.id)
+        return {{name}}_service_pb2.Delete{{Name}}Response(success=success)
+
+    def List{{Name}}s(self, request=None, context=None):
+        return {{name}}_service_pb2.List{{Name}}sResponse({{name}}s=self._repo.list())

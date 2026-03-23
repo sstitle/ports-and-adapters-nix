@@ -1,0 +1,39 @@
+"""Auto-generated {{Name}}Repository port and InMemory{{Name}}Repository adapter."""
+from __future__ import annotations
+
+from typing import Protocol
+
+import {{name}}_pb2
+
+
+class {{Name}}Repository(Protocol):
+    def get(self, id: str) -> {{name}}_pb2.{{Name}} | None: ...
+    def create(self, item: {{name}}_pb2.{{Name}}) -> {{name}}_pb2.{{Name}}: ...
+    def update(self, item: {{name}}_pb2.{{Name}}) -> {{name}}_pb2.{{Name}}: ...
+    def delete(self, id: str) -> bool: ...
+    def list(self) -> list[{{name}}_pb2.{{Name}}]: ...
+
+
+class InMemory{{Name}}Repository:
+    def __init__(self, data: list[dict]) -> None:
+        self._store: dict[str, {{name}}_pb2.{{Name}}] = {}
+        for item in data:
+            msg = {{name}}_pb2.{{Name}}(**item)
+            self._store[msg.id] = msg
+
+    def get(self, id: str) -> {{name}}_pb2.{{Name}} | None:
+        return self._store.get(id)
+
+    def create(self, item: {{name}}_pb2.{{Name}}) -> {{name}}_pb2.{{Name}}:
+        self._store[item.id] = item
+        return item
+
+    def update(self, item: {{name}}_pb2.{{Name}}) -> {{name}}_pb2.{{Name}}:
+        self._store[item.id] = item
+        return item
+
+    def delete(self, id: str) -> bool:
+        return self._store.pop(id, None) is not None
+
+    def list(self) -> list[{{name}}_pb2.{{Name}}]:
+        return list(self._store.values())

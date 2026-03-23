@@ -8,6 +8,20 @@ import (
 	"strings"
 )
 
+type User struct {
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	Role   string `json:"role"`
+	TeamID string `json:"team_id"`
+}
+
+type Team struct {
+	ID        string   `json:"id"`
+	Name      string   `json:"name"`
+	LeadID    string   `json:"lead_id"`
+	MemberIDs []string `json:"member_ids"`
+}
+
 func main() {
 	usersData, err := os.ReadFile(os.Getenv("USERS_DATA"))
 	if err != nil {
@@ -20,32 +34,32 @@ func main() {
 		os.Exit(1)
 	}
 
-	var users []User
-	var teams []Team
-	if err := json.Unmarshal(usersData, &users); err != nil {
+	var rawUsers []*User
+	var rawTeams []*Team
+	if err := json.Unmarshal(usersData, &rawUsers); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	if err := json.Unmarshal(teamsData, &teams); err != nil {
+	if err := json.Unmarshal(teamsData, &rawTeams); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	var userRepo Repository[User] = NewInMemoryRepository(users, func(u User) string { return u.ID })
-	var teamRepo Repository[Team] = NewInMemoryRepository(teams, func(t Team) string { return t.ID })
+	var userRepo UserRepository = NewInMemoryUserRepository(rawUsers)
+	var teamRepo TeamRepository = NewInMemoryTeamRepository(rawTeams)
 
 	fmt.Println("UserRepository:")
-	allUsers := userRepo.All()
+	allUsers := userRepo.ListUsers()
 	sort.Slice(allUsers, func(i, j int) bool { return allUsers[i].ID < allUsers[j].ID })
 	for _, u := range allUsers {
-		fmt.Printf("  %s: %q  role=%s  team=%s\n", u.ID, u.Name, u.Role, u.Team)
+		fmt.Printf("  %s: %q  role=%s  team=%s\n", u.ID, u.Name, u.Role, u.TeamID)
 	}
 
 	fmt.Println()
 	fmt.Println("TeamRepository:")
-	allTeams := teamRepo.All()
+	allTeams := teamRepo.ListTeams()
 	sort.Slice(allTeams, func(i, j int) bool { return allTeams[i].ID < allTeams[j].ID })
 	for _, t := range allTeams {
-		fmt.Printf("  %s: %q  lead=%s  members=[%s]\n", t.ID, t.Name, t.Lead, strings.Join(t.Members, ", "))
+		fmt.Printf("  %s: %q  lead=%s  members=[%s]\n", t.ID, t.Name, t.LeadID, strings.Join(t.MemberIDs, ", "))
 	}
 }

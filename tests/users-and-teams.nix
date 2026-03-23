@@ -55,7 +55,7 @@ in
   };
 
   "test users config bob is on engineering team" = {
-    expr = (users.get "bob").team;
+    expr = (users.get "bob").team_id;
     expected = "engineering";
   };
 
@@ -65,12 +65,12 @@ in
   };
 
   "test teams config engineering lead is alice" = {
-    expr = (teams.get "engineering").lead;
+    expr = (teams.get "engineering").lead_id;
     expected = "alice";
   };
 
   "test teams config design has correct members" = {
-    expr = (teams.get "design").members;
+    expr = (teams.get "design").member_ids;
     expected = [ "carol" "dave" ];
   };
 }

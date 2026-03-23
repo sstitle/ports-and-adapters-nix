@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package users_and_teams;
+
+option go_package = "users-and-teams/proto";
+
+import "{{name}}.proto";
+
+service {{Name}}Service {
+  rpc Get{{Name}}(Get{{Name}}Request) returns (Get{{Name}}Response);
+  rpc Create{{Name}}(Create{{Name}}Request) returns (Create{{Name}}Response);
+  rpc Update{{Name}}(Update{{Name}}Request) returns (Update{{Name}}Response);
+  rpc Delete{{Name}}(Delete{{Name}}Request) returns (Delete{{Name}}Response);
+  rpc List{{Name}}s(List{{Name}}sRequest) returns (List{{Name}}sResponse);
+}
+
+message Get{{Name}}Request {
+  string id = 1;
+}
+
+message Get{{Name}}Response {
+  {{Name}} {{name}} = 1;
+}
+
+message Create{{Name}}Request {
+  {{Name}} {{name}} = 1;
+}
+
+message Create{{Name}}Response {
+  {{Name}} {{name}} = 1;
+}
+
+message Update{{Name}}Request {
+  {{Name}} {{name}} = 1;
+}
+
+message Update{{Name}}Response {
+  {{Name}} {{name}} = 1;
+}
+
+message Delete{{Name}}Request {
+  string id = 1;
+}
+
+message Delete{{Name}}Response {
+  bool success = 1;
+}
+
+message List{{Name}}sRequest {}
+
+message List{{Name}}sResponse {
+  repeated {{Name}} {{name}}s = 1;
+}

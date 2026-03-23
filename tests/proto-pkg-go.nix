@@ -7,7 +7,7 @@ in
   "test mkProtoPkgGo produces a derivation" = {
     expr = builtins.isAttrs (protoPkgGo.mkProtoPkgGo {
       name = "user";
-      proto = (domain.get "user").proto;
+      protos = [ (domain.get "user").proto ];
     });
     expected = true;
   };
@@ -15,7 +15,7 @@ in
   "test mkProtoPkgGo derivation has correct name" = {
     expr = (protoPkgGo.mkProtoPkgGo {
       name = "user";
-      proto = (domain.get "user").proto;
+      protos = [ (domain.get "user").proto ];
     }).name;
     expected = "user-proto-go";
   };

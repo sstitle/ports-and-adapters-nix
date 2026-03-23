@@ -1,10 +1,15 @@
 import json
 import os
 
-import team_pb2  # noqa: F401  (confirms stubs compiled correctly)
-import user_pb2  # noqa: F401
+import user_pb2  # noqa: F401  (confirms base stubs compiled)
+import team_pb2  # noqa: F401
+import user_service_pb2  # noqa: F401  (confirms service stubs compiled)
+import team_service_pb2  # noqa: F401
 
-from repositories import InMemoryRepository, Team, User
+from user_repository import InMemoryUserRepository
+from team_repository import InMemoryTeamRepository
+from user_servicer import UserServicer  # noqa: F401  (confirms gRPC servicer generated)
+from team_servicer import TeamServicer  # noqa: F401
 
 with open(os.environ["USERS_DATA"]) as f:
     users_data = json.load(f)
@@ -12,14 +17,14 @@ with open(os.environ["USERS_DATA"]) as f:
 with open(os.environ["TEAMS_DATA"]) as f:
     teams_data = json.load(f)
 
-user_repo: InMemoryRepository[User] = InMemoryRepository([User(**u) for u in users_data], lambda u: u.id)
-team_repo: InMemoryRepository[Team] = InMemoryRepository([Team(**t) for t in teams_data], lambda t: t.id)
+user_repo = InMemoryUserRepository(users_data)
+team_repo = InMemoryTeamRepository(teams_data)
 
 print("UserRepository:")
-for user in user_repo.all():
-    print(f"  {user.id}: {user.name!r}  role={user.role}  team={user.team}")
+for user in user_repo.list():
+    print(f"  {user.id}: {user.name!r}  role={user.role}  team={user.team_id}")
 
 print()
 print("TeamRepository:")
-for team in team_repo.all():
-    print(f"  {team.id}: {team.name!r}  lead={team.lead}  members={team.members}")
+for team in team_repo.list():
+    print(f"  {team.id}: {team.name!r}  lead={team.lead_id}  members={list(team.member_ids)}")

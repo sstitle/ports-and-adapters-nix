@@ -6,10 +6,7 @@ let
     teams = import ./config/teams.nix;
   };
   nuScriptPkg = import ../../lib/nu-script-pkg.nix { inherit pkgs; };
-  scripts = import ./scripts.nix {
-    inherit domain;
-    inherit (repositories) users teams;
-  };
+  scripts = import ./scripts.nix { inherit domain repositories; };
   showRepositories = import ./python { inherit pkgs domain repositories; };
   showRepositoriesGo = import ./go { inherit pkgs domain repositories; };
   mkApp = pkg: { type = "app"; program = "${pkg}/bin/${pkg.name}"; };

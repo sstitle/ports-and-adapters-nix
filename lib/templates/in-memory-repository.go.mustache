@@ -1,0 +1,55 @@
+package main
+
+// {{Name}}Repository is the port — the interface all {{name}} adapters must satisfy.
+type {{Name}}Repository interface {
+	Get{{Name}}(id string) (*{{Name}}, bool)
+	Create{{Name}}(item *{{Name}}) *{{Name}}
+	Update{{Name}}(item *{{Name}}) (*{{Name}}, bool)
+	Delete{{Name}}(id string) bool
+	List{{Name}}s() []*{{Name}}
+}
+
+// InMemory{{Name}}Repository is the in-memory adapter.
+type InMemory{{Name}}Repository struct {
+	store map[string]*{{Name}}
+}
+
+func NewInMemory{{Name}}Repository(items []*{{Name}}) *InMemory{{Name}}Repository {
+	store := make(map[string]*{{Name}}, len(items))
+	for _, item := range items {
+		store[item.ID] = item
+	}
+	return &InMemory{{Name}}Repository{store: store}
+}
+
+func (r *InMemory{{Name}}Repository) Get{{Name}}(id string) (*{{Name}}, bool) {
+	v, ok := r.store[id]
+	return v, ok
+}
+
+func (r *InMemory{{Name}}Repository) Create{{Name}}(item *{{Name}}) *{{Name}} {
+	r.store[item.ID] = item
+	return item
+}
+
+func (r *InMemory{{Name}}Repository) Update{{Name}}(item *{{Name}}) (*{{Name}}, bool) {
+	if _, ok := r.store[item.ID]; !ok {
+		return nil, false
+	}
+	r.store[item.ID] = item
+	return item, true
+}
+
+func (r *InMemory{{Name}}Repository) Delete{{Name}}(id string) bool {
+	_, ok := r.store[id]
+	delete(r.store, id)
+	return ok
+}
+
+func (r *InMemory{{Name}}Repository) List{{Name}}s() []*{{Name}} {
+	out := make([]*{{Name}}, 0, len(r.store))
+	for _, v := range r.store {
+		out = append(out, v)
+	}
+	return out
+}

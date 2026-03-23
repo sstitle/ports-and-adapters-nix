@@ -1,12 +1,28 @@
 { pkgs, domain, repositories }:
 let
   protoPkgGo = import ../../../lib/proto-pkg-go.nix { inherit pkgs; };
+  repoService = import ../../../lib/mk-repository-service.nix { inherit pkgs; };
 
   protoStubs = pkgs.runCommand "users-and-teams-proto-stubs-go" { } ''
     mkdir $out
     ${builtins.concatStringsSep "\n" (
       map (
-        key: "cp ${protoPkgGo.mkProtoPkgGo { name = key; proto = (domain.get key).proto; }}/* $out/"
+        key:
+        let
+          entity = domain.get key;
+          serviceProto = repoService.mkRepositoryServiceProto {
+            inherit key;
+            entityName = entity.name;
+          };
+          stubs = protoPkgGo.mkProtoPkgGo {
+            name = key;
+            protos = [
+              entity.proto
+              serviceProto
+            ];
+          };
+        in
+        "cp ${stubs}/* $out/"
       ) domain.names
     )}
   '';
@@ -30,15 +46,26 @@ let
     src = pkgs.runCommand "go-src" { } ''
       mkdir -p $out
       cp ${./main.go} $out/main.go
-      cp ${./repositories.go} $out/repositories.go
+      ${builtins.concatStringsSep "\n" (
+        map (
+          key:
+          let
+            entity = domain.get key;
+            repoFile = repoService.mkInMemoryRepositoryGo {
+              inherit key;
+              entityName = entity.name;
+            };
+          in
+          "cp ${repoFile} $out/${repoFile.name}"
+        ) domain.names
+      )}
       cat > $out/go.mod <<'EOF'
 module show-repositories-go
 
 go 1.21
 EOF
     '';
-    # protoStubs is a build-time validation that the .go files compile;
-    # the binary itself uses only stdlib so no vendor hash is needed
+    # protoStubs validates the service proto compiles; the binary itself is stdlib-only
     nativeBuildInputs = [ protoStubs ];
     vendorHash = null;
   };

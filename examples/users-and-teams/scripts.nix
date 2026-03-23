@@ -1,8 +1,8 @@
-{ domain, users, teams }:
+{ domain, repositories }:
 let
   nuScript = import ../../lib/nu-script.nix;
-  usersJson = builtins.toJSON (builtins.attrValues users.entries);
-  teamsJson = builtins.toJSON (builtins.attrValues teams.entries);
+  usersJson = builtins.toJSON (builtins.attrValues repositories.users.entries);
+  teamsJson = builtins.toJSON (builtins.attrValues repositories.teams.entries);
   domainEntitiesJson = builtins.toJSON (
     map (key: { inherit key; name = (domain.get key).name; }) domain.names
   );
@@ -31,7 +31,7 @@ in
     script = ''
       '${teamsJson}'
       | from json
-      | update members { $in | str join ", " }
+      | update member_ids { $in | str join ", " }
       | table
     '';
   };
@@ -49,7 +49,7 @@ in
       print "Teams:"
       '${teamsJson}'
       | from json
-      | update members { $in | str join ", " }
+      | update member_ids { $in | str join ", " }
       | table
     '';
   };
