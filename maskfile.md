@@ -10,12 +10,28 @@ This is a [mask](https://github.com/jacobdeichert/mask) task runner file.
 nix run github:nix-community/nix-unit -- --flake '.#tests'
 ```
 
-## run
+## show-users
 
-> Display port configuration as a table
+> Display all users as a table
 
 ```bash
-nix run .#show-ports
+nix run .#show-users
+```
+
+## show-teams
+
+> Display all teams as a table
+
+```bash
+nix run .#show-teams
+```
+
+## show-all
+
+> Display users and teams
+
+```bash
+nix run .#show-all
 ```
 
 ## hello

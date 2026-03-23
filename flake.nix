@@ -34,32 +34,12 @@
         }:
         let
           treefmtEval = inputs.treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
-          nuScript = import ./lib/nu-script.nix;
-          nuScriptPkg = import ./lib/nu-script-pkg.nix { inherit pkgs; };
-          showPorts = nuScriptPkg.toPackage (nuScript.mkNuScript {
-            name = "show-ports";
-            script = ''
-              [
-                {service: "http",  port: 80,  protocol: "tcp", status: "active"},
-                {service: "https", port: 443, protocol: "tcp", status: "active"},
-                {service: "ssh",   port: 22,  protocol: "tcp", status: "active"},
-                {service: "dns",   port: 53,  protocol: "udp", status: "active"},
-                {service: "smtp",  port: 25,  protocol: "tcp", status: "inactive"}
-              ]
-              | to json
-              | from json
-              | table
-            '';
-          });
+          usersAndTeams = import ./examples/users-and-teams { inherit pkgs; };
         in
         {
           devShells.default = import ./shell.nix { inherit pkgs; };
 
-          packages.show-ports = showPorts;
-          apps.show-ports = {
-            type = "app";
-            program = "${showPorts}/bin/show-ports";
-          };
+          inherit (usersAndTeams) packages apps;
 
           # for `nix fmt`
           formatter = treefmtEval.config.build.wrapper;
