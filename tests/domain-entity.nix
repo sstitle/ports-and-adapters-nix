@@ -1,6 +1,6 @@
 let
   domainEntity = import ../lib/domain-entity.nix;
-  domainEntityRegistry = import ../lib/domain-entity-registry.nix;
+  repository = import ../lib/repository.nix;
   domain = import ../examples/users-and-teams/domain-entities;
 in
 {
@@ -20,18 +20,18 @@ in
     expected = "path";
   };
 
-  "test mkDomainEntityRegistry names lists all entities" = {
-    expr = (domainEntityRegistry.mkDomainEntityRegistry {
+  "test mkRepository with domain entities lists all names" = {
+    expr = (repository.mkRepository {
       user = domainEntity.mkDomainEntity { name = "User"; proto = ../examples/users-and-teams/domain-entities/user/user.proto; };
       team = domainEntity.mkDomainEntity { name = "Team"; proto = ../examples/users-and-teams/domain-entities/team/team.proto; };
     }).names;
     expected = [ "team" "user" ];
   };
 
-  "test mkDomainEntityRegistry register preserves type" = {
+  "test mkRepository with domain entities register preserves entries" = {
     expr =
       let
-        reg = domainEntityRegistry.mkDomainEntityRegistry { };
+        reg = repository.mkRepository { };
         updated = reg.register "user" (domainEntity.mkDomainEntity {
           name = "User";
           proto = ../examples/users-and-teams/domain-entities/user/user.proto;

@@ -31,8 +31,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	userRepo := NewInMemoryUserRepository(users)
-	teamRepo := NewInMemoryTeamRepository(teams)
+	var userRepo Repository[User] = NewInMemoryRepository(users, func(u User) string { return u.ID })
+	var teamRepo Repository[Team] = NewInMemoryRepository(teams, func(t Team) string { return t.ID })
 
 	fmt.Println("UserRepository:")
 	allUsers := userRepo.All()

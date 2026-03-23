@@ -1,7 +1,7 @@
 let
-  domainEntityRegistry = import ../../../lib/domain-entity-registry.nix;
+  repository = import ../../../lib/repository.nix;
 in
-domainEntityRegistry.mkDomainEntityRegistry {
+repository.mkRepository {
   user = import ./user;
   team = import ./team;
 }

@@ -1,4 +1,4 @@
-{ pkgs, domain, users, teams }:
+{ pkgs, domain, repositories }:
 let
   protoPkg = import ../../../lib/proto-pkg.nix { inherit pkgs; };
 
@@ -11,12 +11,17 @@ let
     )}
   '';
 
-  usersData = pkgs.writeText "users.json" (
-    builtins.toJSON (map (key: (users.get key) // { id = key; }) users.names)
-  );
+  repoDataFiles = builtins.mapAttrs (
+    name: repo:
+    pkgs.writeText "${name}.json" (
+      builtins.toJSON (map (key: (repo.get key) // { id = key; }) repo.names)
+    )
+  ) repositories;
 
-  teamsData = pkgs.writeText "teams.json" (
-    builtins.toJSON (map (key: (teams.get key) // { id = key; }) teams.names)
+  dataEnv = builtins.concatStringsSep " \\\n    " (
+    pkgs.lib.mapAttrsToList (
+      name: dataFile: ''${pkgs.lib.toUpper name}_DATA="${dataFile}"''
+    ) repoDataFiles
   );
 
   pythonEnv = pkgs.python3.withPackages (ps: [
@@ -30,8 +35,7 @@ pkgs.writeShellApplication {
   runtimeInputs = [ pythonEnv ];
   text = ''
     PYTHONPATH="${protoStubs}:${./.}" \
-    USERS_DATA="${usersData}" \
-    TEAMS_DATA="${teamsData}" \
+    ${dataEnv} \
     python3 ${./main.py}
   '';
 }

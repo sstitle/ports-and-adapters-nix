@@ -1,7 +1,7 @@
 let
-  userRepository = import ../lib/user-repository.nix;
+  repository = import ../../../lib/repository.nix;
 in
-userRepository.mkUserRepository {
+repository.mkRepository {
   alice = { name = "Alice Smith"; role = "admin"; team = "engineering"; };
   bob = { name = "Bob Jones"; role = "developer"; team = "engineering"; };
   carol = { name = "Carol White"; role = "designer"; team = "design"; };

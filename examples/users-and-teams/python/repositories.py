@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Callable, Generic, Optional, TypeVar
 
 from pydantic import BaseModel
+
+T = TypeVar("T")
 
 
 class User(BaseModel):
@@ -19,23 +21,12 @@ class Team(BaseModel):
     members: list[str]
 
 
-class InMemoryUserRepository:
-    def __init__(self, users: list[User]) -> None:
-        self._store: dict[str, User] = {u.id: u for u in users}
+class InMemoryRepository(Generic[T]):
+    def __init__(self, items: list[T], key: Callable[[T], str]) -> None:
+        self._store: dict[str, T] = {key(item): item for item in items}
 
-    def get(self, id: str) -> Optional[User]:
+    def get(self, id: str) -> Optional[T]:
         return self._store.get(id)
 
-    def all(self) -> list[User]:
-        return list(self._store.values())
-
-
-class InMemoryTeamRepository:
-    def __init__(self, teams: list[Team]) -> None:
-        self._store: dict[str, Team] = {t.id: t for t in teams}
-
-    def get(self, id: str) -> Optional[Team]:
-        return self._store.get(id)
-
-    def all(self) -> list[Team]:
+    def all(self) -> list[T]:
         return list(self._store.values())

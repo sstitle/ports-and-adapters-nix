@@ -1,31 +1,30 @@
 let
-  userRepository = import ../examples/users-and-teams/lib/user-repository.nix;
-  teamRepository = import ../examples/users-and-teams/lib/team-repository.nix;
+  repository = import ../lib/repository.nix;
   users = import ../examples/users-and-teams/config/users.nix;
   teams = import ../examples/users-and-teams/config/teams.nix;
 in
 {
-  "test mkUserRepository get returns a user" = {
-    expr = (userRepository.mkUserRepository {
+  "test mkRepository get returns an entry" = {
+    expr = (repository.mkRepository {
       alice = { name = "Alice"; role = "admin"; };
     }).get "alice";
     expected = { name = "Alice"; role = "admin"; };
   };
 
-  "test mkUserRepository register returns a user repository" = {
+  "test mkRepository register returns a repository" = {
     expr =
       let
-        repo = userRepository.mkUserRepository { };
+        repo = repository.mkRepository { };
         updated = repo.register "bob" { name = "Bob"; role = "user"; };
       in
       updated.get "bob";
     expected = { name = "Bob"; role = "user"; };
   };
 
-  "test mkUserRepository register preserves existing entries" = {
+  "test mkRepository register preserves existing entries" = {
     expr =
       let
-        repo = userRepository.mkUserRepository {
+        repo = repository.mkRepository {
           alice = { name = "Alice"; role = "admin"; };
         };
         updated = repo.register "bob" { name = "Bob"; role = "user"; };
@@ -34,31 +33,15 @@ in
     expected = [ "alice" "bob" ];
   };
 
-  "test mkTeamRepository get returns a team" = {
-    expr = (teamRepository.mkTeamRepository {
-      engineering = { name = "Engineering"; members = [ "alice" "bob" ]; };
-    }).get "engineering";
-    expected = { name = "Engineering"; members = [ "alice" "bob" ]; };
-  };
-
-  "test mkTeamRepository register returns a team repository" = {
+  "test two repositories are independent" = {
     expr =
       let
-        repo = teamRepository.mkTeamRepository { };
-        updated = repo.register "design" { name = "Design"; members = [ "carol" ]; };
+        r1 = repository.mkRepository { alice = { name = "Alice"; }; };
+        r2 = repository.mkRepository { eng = { name = "Engineering"; }; };
+        r1updated = r1.register "extra" { name = "Extra"; };
       in
-      updated.get "design";
-    expected = { name = "Design"; members = [ "carol" ]; };
-  };
-
-  "test mkTeamRepository is distinct from mkUserRepository" = {
-    expr =
-      let
-        ur = userRepository.mkUserRepository { alice = { name = "Alice"; role = "admin"; }; };
-        tr = teamRepository.mkTeamRepository { eng = { name = "Engineering"; members = [ "alice" ]; }; };
-      in
-      ur.names != tr.names;
-    expected = true;
+      r2.has "extra";
+    expected = false;
   };
 
   "test users config has all users" = {

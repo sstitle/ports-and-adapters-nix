@@ -1,4 +1,4 @@
-{ pkgs, domain, users, teams }:
+{ pkgs, domain, repositories }:
 let
   protoPkgGo = import ../../../lib/proto-pkg-go.nix { inherit pkgs; };
 
@@ -11,12 +11,17 @@ let
     )}
   '';
 
-  usersData = pkgs.writeText "users.json" (
-    builtins.toJSON (map (key: (users.get key) // { id = key; }) users.names)
-  );
+  repoDataFiles = builtins.mapAttrs (
+    name: repo:
+    pkgs.writeText "${name}.json" (
+      builtins.toJSON (map (key: (repo.get key) // { id = key; }) repo.names)
+    )
+  ) repositories;
 
-  teamsData = pkgs.writeText "teams.json" (
-    builtins.toJSON (map (key: (teams.get key) // { id = key; }) teams.names)
+  dataEnv = builtins.concatStringsSep " \\\n    " (
+    pkgs.lib.mapAttrsToList (
+      name: dataFile: ''${pkgs.lib.toUpper name}_DATA="${dataFile}"''
+    ) repoDataFiles
   );
 
   goBin = pkgs.buildGoModule {
@@ -42,8 +47,7 @@ pkgs.writeShellApplication {
   name = "show-repositories-go";
   runtimeInputs = [ goBin ];
   text = ''
-    USERS_DATA="${usersData}" \
-    TEAMS_DATA="${teamsData}" \
+    ${dataEnv} \
     show-repositories-go
   '';
 }
