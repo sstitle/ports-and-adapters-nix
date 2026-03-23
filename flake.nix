@@ -8,8 +8,6 @@
     nix-unit.url = "github:nix-community/nix-unit";
     nix-unit.inputs.nixpkgs.follows = "nixpkgs";
     nix-unit.inputs.flake-parts.follows = "flake-parts";
-    nixdoc.url = "github:nix-community/nixdoc";
-    nixdoc.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -47,16 +45,6 @@
           checks = {
             formatting = treefmtEval.config.build.check self;
           };
-
-          packages.docs = pkgs.runCommand "user-lib-docs" {
-            nativeBuildInputs = [ inputs'.nixdoc.packages.default ];
-          } ''
-            nixdoc \
-              --file ${./lib/user.nix} \
-              --category "user" \
-              --description "User domain model functions" \
-              > $out
-          '';
 
           nix-unit.inputs = {
             inherit (inputs) nixpkgs flake-parts nix-unit;

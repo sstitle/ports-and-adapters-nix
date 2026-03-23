@@ -5,7 +5,6 @@ pkgs.mkShell {
     git
     mask
     nushell
-    pandoc
     uv
   ];
 
