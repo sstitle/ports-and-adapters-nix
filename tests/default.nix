@@ -51,4 +51,12 @@ in
     }));
     expected = true;
   };
+
+  "test toPackage exposes a syntaxCheck derivation" = {
+    expr = builtins.isAttrs (nuScriptPkg.toPackage (nuScript.mkNuScript {
+      name = "show-ports";
+      script = "echo hi";
+    })).syntaxCheck;
+    expected = true;
+  };
 } else { })
