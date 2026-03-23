@@ -3,4 +3,7 @@
   // import ./nu-script.nix
   // import ./users-and-teams.nix
   // import ./domain-entity.nix
-  // (if pkgs != null then import ./nu-script-pkg.nix { inherit pkgs; } else { })
+  // (if pkgs != null then
+    import ./nu-script-pkg.nix { inherit pkgs; }
+    // import ./proto-pkg.nix { inherit pkgs; }
+  else { })

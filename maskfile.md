@@ -34,6 +34,14 @@ nix run .#show-teams
 nix run .#show-all
 ```
 
+## show-repositories
+
+> Display UserRepository and TeamRepository contents via Python and Pydantic
+
+```bash
+nix run .#show-repositories
+```
+
 ## hello
 
 > This is an example command you can run with `mask hello`
