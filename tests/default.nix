@@ -6,4 +6,5 @@
   // (if pkgs != null then
     import ./nu-script-pkg.nix { inherit pkgs; }
     // import ./proto-pkg.nix { inherit pkgs; }
+    // import ./proto-pkg-go.nix { inherit pkgs; }
   else { })

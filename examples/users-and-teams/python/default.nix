@@ -1,9 +1,6 @@
-{ pkgs }:
+{ pkgs, domain, users, teams }:
 let
   protoPkg = import ../../../lib/proto-pkg.nix { inherit pkgs; };
-  domain = import ../domain-entities;
-  users = import ../config/users.nix;
-  teams = import ../config/teams.nix;
 
   protoStubs = pkgs.runCommand "users-and-teams-proto-stubs" { } ''
     mkdir $out

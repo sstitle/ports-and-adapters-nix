@@ -1,8 +1,6 @@
+{ domain, users, teams }:
 let
   nuScript = import ../../lib/nu-script.nix;
-  users = import ./config/users.nix;
-  teams = import ./config/teams.nix;
-  domain = import ./domain-entities;
   usersJson = builtins.toJSON (builtins.attrValues users.entries);
   teamsJson = builtins.toJSON (builtins.attrValues teams.entries);
   domainEntitiesJson = builtins.toJSON (

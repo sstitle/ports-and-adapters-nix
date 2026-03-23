@@ -42,6 +42,14 @@ nix run .#show-all
 nix run .#show-repositories
 ```
 
+## show-repositories-go
+
+> Display UserRepository and TeamRepository contents via Go
+
+```bash
+nix run .#show-repositories-go
+```
+
 ## hello
 
 > This is an example command you can run with `mask hello`
